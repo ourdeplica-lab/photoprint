@@ -70,6 +70,7 @@ summary small{margin-left:10px;font-weight:400;font-size:13px;color:var(--sub)}
   </section>
 
   <main id="main" hidden>
+    <div id="demo" class="status bad" hidden><b>연습 화면입니다 — 실제로 출력되지 않습니다.</b><br>서버 열쇠가 없습니다. 링크 끝에 <b>#AKfycb…</b>(구글 배포 ID)를 붙여 한 번 열어 주세요.</div>
     <div class="paper"><canvas id="view" hidden></canvas><div id="empty" class="empty">사진을 고르면<br>인쇄될 모습 그대로 보여 드립니다</div></div>
     <div id="meta" class="meta" hidden></div>
     <h2 class="step">1. 사진</h2>
@@ -109,7 +110,7 @@ summary small{margin-left:10px;font-weight:400;font-size:13px;color:var(--sub)}
     function st(){return {ver:'demo',online:true,job:job}}
     return {apiState:function(){return st()},
       apiSend:function(p,wb,h,b){if(b.length!==Math.ceil(wb*h/3)*4)throw new Error('사진 자료가 깨졌습니다.');var j=job={id:String(Date.now()),st:'wait',msg:''};
-        setTimeout(function(){if(j.st==='wait')j.st='sent'},2000);setTimeout(function(){if(j.st==='sent'){j.st='done';j.msg='데모: COM2 로 '+(wb*h)+'바이트'}},5000);return st()},
+        setTimeout(function(){if(j.st==='wait')j.st='sent'},2000);setTimeout(function(){if(j.st==='sent'){j.st='done';j.msg='(연습 화면이라 실제로는 출력되지 않았습니다)'}},5000);return st()},
       apiCancel:function(){if(job&&job.st==='wait'){job.st='cancel';job.msg='취소했습니다.'}return st()}};
   })();
   function call(fn){
@@ -267,7 +268,8 @@ summary small{margin-left:10px;font-weight:400;font-size:13px;color:var(--sub)}
   function show(kind,msg){var s=$('status');s.className='status'+(kind?' '+kind:'');s.textContent=msg;s.hidden=!msg}
   var LABEL={wait:'포스 도우미가 가져가기를 기다리는 중…',sent:'프린터로 보내는 중…',done:'출력했습니다.',fail:'출력하지 못했습니다.',cancel:'취소했습니다.'};
   function apply(s){
-    state=s;var c=$('conn');c.className='conn '+(s.online?'on':'off');c.querySelector('b').textContent=s.online?'포스 연결됨':'포스 꺼짐';
+    state=s;var c=$('conn');c.className='conn '+(!apiId?'':s.online?'on':'off');
+    c.querySelector('b').textContent=!apiId?'연습 화면':s.online?'포스 연결됨':'포스 꺼짐';/* 열쇠 없이 연 데모는 진짜 포스와 무관 */
     var j=s.job;if(watching&&j&&j.id===sentId){/* 늦게 도착한 앞 사진 상태는 무시 */show(j.st==='done'?'ok':(j.st==='fail'?'bad':''),LABEL[j.st]+(j.msg?' '+j.msg:''));
       if(j.st!=='wait'&&j.st!=='sent'){watching=false;$('go').disabled=!bits}}
   }
@@ -281,7 +283,7 @@ summary small{margin-left:10px;font-weight:400;font-size:13px;color:var(--sub)}
   $('pinIn').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.isComposing)$('pinOk').click()});
   /* 화면이 열려 있는 동안 2초마다 상태 확인 → 서버가 도우미에게 "빨리 물어봐(3초)" 라고 알려 준다 */
   setInterval(tick,2000);
-  if(!apiId){pin='demo';$('main').hidden=false;tick()}else if(pin){$('main').hidden=false;tick()}else ask();
+  if(!apiId){pin='demo';$('demo').hidden=false;$('main').hidden=false;tick()}else if(pin){$('main').hidden=false;tick()}else ask();
 })();
 </script>
 </body>
